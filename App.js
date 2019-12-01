@@ -94,6 +94,11 @@ export default class App extends Component {
           iterations: 3,
         },
       ),
+
+      Animated.timing(this.state.ballY, {
+        toValue: 500,
+        duration: 500,
+      }),
     ]).start();
 
     // const timing1 = Animated.timing(this.state.ballY, {
@@ -115,7 +120,18 @@ export default class App extends Component {
     return (
       <View style={styles.container}>
         <Animated.View
-          style={[styles.ball, {top: this.state.ballY, left: this.state.ballX}]}
+          style={[
+            styles.ball,
+            {
+              top: this.state.ballY,
+              left: this.state.ballX,
+              opacity: this.state.ballY.interpolate({
+                inputRange: [0, 150, 200],
+                outputRange: [1, 1, 0.2],
+                extrapolate: 'clamp',
+              }),
+            },
+          ]}
         />
       </View>
     );
