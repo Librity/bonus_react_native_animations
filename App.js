@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {StyleSheet, View, Animated} from 'react-native';
+import {StyleSheet, View, Animated, PanResponder} from 'react-native';
 
 // https://facebook.github.io/react-native/docs/animated
 
@@ -8,128 +8,163 @@ import {StyleSheet, View, Animated} from 'react-native';
 // Animated.Image
 // Animated.ScrollView
 
-const ballY = new Animated.Value(0);
-const ballX = new Animated.Value(0);
+// const ballY = new Animated.Value(0);
+// const ballX = new Animated.Value(0);
 // const ballX = Animated.divide(ballY, 2);
+const ball = new Animated.ValueXY({x: 0, y: 0});
 
 export default class App extends Component {
   state = {
-    ballY,
-    ballX,
+    // ballY, ballX,
+    ball,
   };
 
-  componentDidMount() {
-    Animated.sequence([
-      Animated.timing(this.state.ballY, {
-        toValue: 200,
-        duration: 500,
-      }),
+  UNSAFE_componentWillMount() {
+    this._panResponder = PanResponder.create({
+      onMoveShouldSetPanResponder: (e, gestureState) => true,
 
-      Animated.delay(100),
+      onPanResponderGrant: (e, gestureState) => {
+        this.state.ball.setOffset({
+          x: this.state.ball.x._value,
+          y: this.state.ball.y._value,
+        });
 
-      Animated.timing(this.state.ballX, {
-        toValue: 200,
-        duration: 500,
-      }),
+        this.state.ball.setValue({x: 0, y: 0});
+      },
 
-      Animated.parallel([
-        Animated.timing(this.state.ballY, {
-          toValue: 0,
-          duration: 500,
-        }),
-
-        Animated.timing(this.state.ballX, {
-          toValue: 0,
-          duration: 500,
-        }),
-      ]),
-
-      Animated.stagger(100, [
-        Animated.timing(this.state.ballY, {
-          toValue: 200,
-          duration: 500,
-        }),
-
-        Animated.timing(this.state.ballX, {
-          toValue: 200,
-          duration: 500,
-        }),
-      ]),
-
-      Animated.parallel([
-        Animated.timing(this.state.ballY, {
-          toValue: 0,
-          duration: 500,
-        }),
-
-        Animated.timing(this.state.ballX, {
-          toValue: 0,
-          duration: 500,
-        }),
-      ]),
-
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(this.state.ballY, {
-            toValue: 200,
-            duration: 200,
-          }),
-
-          Animated.timing(this.state.ballX, {
-            toValue: 200,
-            duration: 200,
-          }),
-
-          Animated.timing(this.state.ballY, {
-            toValue: 0,
-            duration: 200,
-          }),
-
-          Animated.timing(this.state.ballX, {
-            toValue: 0,
-            duration: 200,
-          }),
-        ]),
+      onPanResponderMove: Animated.event(
+        [
+          null,
+          {
+            dx: this.state.ball.x,
+            dy: this.state.ball.y,
+          },
+        ],
         {
-          iterations: 3,
+          listener: (e, gestureState) => {
+            console.log(gestureState);
+          },
         },
       ),
 
-      Animated.timing(this.state.ballY, {
-        toValue: 500,
-        duration: 500,
-      }),
-    ]).start();
-
-    // const timing1 = Animated.timing(this.state.ballY, {
-    //   toValue: 500,
-    //   duration: 1000,
-    // }).start();
-
-    // const spring1 = Animated.spring(this.state.ballX, {
-    //   toValue: 300,
-    //   bounciness: 50,
-    // }).start();
-
-    // const decay1 = Animated.decay(this.state.ballY, {
-    //   velocity: 0.5,
-    // }).start();
+      onPanResponderRelease: () => {
+        this.state.ball.flattenOffset();
+      },
+    });
   }
+
+  // componentDidMount() {
+  //   Animated.sequence([
+  //     Animated.timing(this.state.ballY, {
+  //       toValue: 200,
+  //       duration: 500,
+  //     }),
+
+  //     Animated.delay(100),
+
+  //     Animated.timing(this.state.ballX, {
+  //       toValue: 200,
+  //       duration: 500,
+  //     }),
+
+  //     Animated.parallel([
+  //       Animated.timing(this.state.ballY, {
+  //         toValue: 0,
+  //         duration: 500,
+  //       }),
+
+  //       Animated.timing(this.state.ballX, {
+  //         toValue: 0,
+  //         duration: 500,
+  //       }),
+  //     ]),
+
+  //     Animated.stagger(100, [
+  //       Animated.timing(this.state.ballY, {
+  //         toValue: 200,
+  //         duration: 500,
+  //       }),
+
+  //       Animated.timing(this.state.ballX, {
+  //         toValue: 200,
+  //         duration: 500,
+  //       }),
+  //     ]),
+
+  //     Animated.parallel([
+  //       Animated.timing(this.state.ballY, {
+  //         toValue: 0,
+  //         duration: 500,
+  //       }),
+
+  //       Animated.timing(this.state.ballX, {
+  //         toValue: 0,
+  //         duration: 500,
+  //       }),
+  //     ]),
+
+  //     Animated.loop(
+  //       Animated.sequence([
+  //         Animated.timing(this.state.ballY, {
+  //           toValue: 200,
+  //           duration: 200,
+  //         }),
+
+  //         Animated.timing(this.state.ballX, {
+  //           toValue: 200,
+  //           duration: 200,
+  //         }),
+
+  //         Animated.timing(this.state.ballY, {
+  //           toValue: 0,
+  //           duration: 200,
+  //         }),
+
+  //         Animated.timing(this.state.ballX, {
+  //           toValue: 0,
+  //           duration: 200,
+  //         }),
+  //       ]),
+  //       {
+  //         iterations: 3,
+  //       },
+  //     ),
+
+  //     Animated.timing(this.state.ballY, {
+  //       toValue: 500,
+  //       duration: 500,
+  //     }),
+
+  //     Animated.spring(this.state.ballX, {
+  //       toValue: 300,
+  //       bounciness: 50,
+  //     }),
+
+  //     Animated.decay(this.state.ballY, {
+  //       velocity: 0.5,
+  //     }),
+  //   ]).start();
+  // }
 
   render() {
     return (
       <View style={styles.container}>
         <Animated.View
+          {...this._panResponder.panHandlers}
           style={[
             styles.ball,
             {
-              top: this.state.ballY,
-              left: this.state.ballX,
-              opacity: this.state.ballY.interpolate({
-                inputRange: [0, 150, 200],
-                outputRange: [1, 1, 0.2],
-                extrapolate: 'clamp',
-              }),
+              transform: [
+                {translateX: this.state.ball.x},
+                {translateY: this.state.ball.y},
+              ],
+              // top: this.state.ballY,
+              // left: this.state.ballX,
+              // opacity: this.state.ballY.interpolate({
+              //   inputRange: [0, 150, 200],
+              //   outputRange: [1, 1, 0.2],
+              //   extrapolate: 'clamp',
+              // }),
             },
           ]}
         />
